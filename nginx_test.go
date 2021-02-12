@@ -14,13 +14,11 @@ import (
 func TestNginx(t *testing.T) {
 	ctx := context.Background()
 
-	fmt.Println("Starting NGINX container...")
+	fmt.Println("Starting NGINX container")
 	req := testcontainers.ContainerRequest{
 		Image:        "nginx",
 		ExposedPorts: []string{"80/tcp"},
-		// Networks:     []string{"host"},
-		Networks:   []string{"testing"},
-		WaitingFor: wait.ForHTTP("/"),
+		WaitingFor:   wait.ForHTTP("/"),
 	}
 	cont, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
@@ -29,13 +27,15 @@ func TestNginx(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	defer cont.Terminate(ctx)
+	fmt.Println("NGINX up and running")
 
 	ip, err := cont.Host(ctx)
 	if err != nil {
 		t.Error(err)
 	}
-	port, err := cont.MappedPort(ctx, "80/tcp")
+	port, err := cont.MappedPort(ctx, "80")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,14 +50,11 @@ func TestNginx(t *testing.T) {
 		fmt.Printf("\t %s -> %v \n", k, v)
 	}
 
-	fmt.Println("Testing use cases...")
-	// port
+	fmt.Println("Testing use cases")
 	assert.NotEqual(t, "", ip)
 	assert.NotEqual(t, "", port)
-	// response
+
+	fmt.Println("Testing http call")
 	resp, err := http.Get(fmt.Sprintf("http://%s:%s", ip, port.Port()))
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	// if resp.StatusCode != http.StatusOK {
-	// 	t.Errorf("Expected status code %d. Got %d.", http.StatusOK, resp.StatusCode)
-	// }
 }
