@@ -31,7 +31,7 @@ const (
 		CONSTRAINT products_pkey PRIMARY KEY (id)
 	)`
 	insertQuery = "INSERT INTO products(name, price) VALUES($1, $2) RETURNING id"
-	selectQuery = "SELECT id,name,price FROM products LIMIT $1 OFFSET $2"
+	selectQuery = "SELECT id,name,price FROM products ORDER BY id ASC LIMIT $1 OFFSET $2"
 	deleteQuery = "DELETE FROM products WHERE id = $1"
 )
 
